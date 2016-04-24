@@ -1,3 +1,15 @@
+# Backups
+*~
+*.bak
+
+# Other
+*.def
+*.bat
+
+# Executable files
+*.tap
+*.dsk
+
 # Object files
 *.o
 *.ko
