@@ -1,0 +1,6 @@
+{
+  "name": "Bares",
+  "tagline": "Un juego conversacional para Sinclair Spectrum +, hecho con z88dk.",
+  "body": "Bares\r\n=====\r\n\r\nBuceas en la Estaca de Bares, un fantástico paraíso de coral ante ti. Por encima de tu cabeza, se encuentra la antigua base estadounidense LORAM, de la que se dijo que siempre había tenido una base de submarinos en su interior...\r\n\r\nImplementación\r\n==============\r\n\r\nBares es un juego minimalista, pero con la esperanza de ser suficientemente rico en respuestas, para el [Sinclair Spectrum](https://es.wikipedia.org/wiki/Sinclair_ZX_Spectrum).\r\n\r\nHa sido creado con [z88dk](http://www.z88dk.org/), un compilador (y *toolchain* completa) de C para máquinas de 8 bits.\r\n\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
