@@ -18,7 +18,7 @@ extern void play_intro();
 extern void cls();
 extern bool ask_yes_no(const char * msg);
 extern void set_default_colors();
-extern void set_anwser_colors();
+extern void set_answer_colors();
 extern void print(const char *);
 extern char * input(const char *);
 extern void proc1(Player *);
