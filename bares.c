@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <conio.h>
-#include <graphics.h>
 #include <ctype.h>
 
 #include "player.h"
