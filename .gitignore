@@ -1,6 +1,11 @@
 # Backups
 *~
 *.bak
+# Direct executables
+bares
+bares.cpc
+bares.tap
+bares.reloc
 
 # Other
 *.def
