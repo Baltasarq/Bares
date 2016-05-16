@@ -11,7 +11,12 @@
 #include "bool.h"
 
 /* Constants */
-const int MAX_COL = 64;
+#ifdef __CPC__
+    const int MAX_COL = 34;
+#else
+    const int MAX_COL = 64;
+#endif
+
 const char * PROMPT = ":> ";
 const char * PROMPT_WAIT = "Pulsa ENTER...";
 
@@ -24,7 +29,7 @@ Order * parse(char * buffer);
 void play_intro()
 {
   cls();
-  printf( "Bares v1.0 20160424\tBaltasar el arquero\n"
+  printf( "Bares v1.1 20160516\tBaltasar el arquero\n"
           "Teclea \"ayuda\" para conocer los posibles comandos.\n\n\n\n\n\n" );
   print( "Un perfecto tiempo de descanso en las profundidades de la estaca "
           "de Bares. Buceando, disfrutando del momento de paz y sosiego que "
@@ -97,14 +102,21 @@ int main()
 
 void set_default_colors()
 {
-    textbackground( WHITE );
-    textcolor( BLUE );
+    #ifdef __CPC__
+        textbackground( BLUE );
+        textcolor( WHITE );
+    #else
+        textbackground( WHITE );
+        textcolor( BLUE );
+    #endif
 }
 
 void set_answer_colors()
 {
-    textbackground( WHITE );
-    textcolor( BLACK );
+    #ifndef __CPC__
+        textbackground( WHITE );
+        textcolor( BLACK );
+    #endif
 }
 
 /** Cleans the screen and sets the appropriate colors */
@@ -122,14 +134,21 @@ char * input(const char * msg)
 	static char buffer[32];
 
 	// Prompt
-	textbackground( BLUE );
-	textcolor( YELLOW );
+    #ifndef __CPC__
+        textbackground( BLUE );
+        textcolor( YELLOW );
+    #endif
 	cprintf( "%s", msg );
 	fflush( stdout );
 
 	// Get order
-	set_default_colors();
-    textcolor( RED );
+    #ifndef __CPC__
+        set_default_colors();
+        textcolor( RED );
+    #else
+        textcolor( YELLOW );
+    #endif
+
 	printf( " " );
 	fgets( buffer, 32, stdin );
 
@@ -140,7 +159,11 @@ char * input(const char * msg)
 		*last_char = 0;
 	}
 
-    set_default_colors();
+    #ifndef __CPC__
+        set_default_colors();
+    #else
+        textcolor( WHITE );
+    #endif
 	return buffer;
 }
 
