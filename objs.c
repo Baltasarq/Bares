@@ -59,7 +59,7 @@ void init_objs()
 	objs[ 5 ].id = "submarino";
 	objs[ 5 ].num_loc = 3;
 	objs[ 5 ].atr = Static;
-	objs[ 5 ].words = " subma sumer buque navio barco torre escale escala ";
+	objs[ 5 ].words = " subma sumer buque navio barco torre escal pasar ";
 	objs[ 5 ].desc = "Por una escalerilla al este, es perfectamente posible "
 						"subir a la torre del sumergible.";
 

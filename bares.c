@@ -4,6 +4,10 @@
 #include <conio.h>
 #include <ctype.h>
 
+#ifdef __CPC__
+    #include "cpc.h"
+#endif
+
 #include "player.h"
 #include "cmds.h"
 #include "locs.h"
@@ -11,12 +15,7 @@
 #include "bool.h"
 
 /* Constants */
-#ifdef __CPC__
-    const int MAX_COL = 34;
-#else
-    const int MAX_COL = 64;
-#endif
-
+const int MAX_COL = 64;
 const char * PROMPT = ":> ";
 const char * PROMPT_WAIT = "Pulsa ENTER...";
 
@@ -29,8 +28,8 @@ Order * parse(char * buffer);
 void play_intro()
 {
   cls();
-  printf( "Bares v1.1 20160516\tBaltasar el arquero\n"
-          "Teclea \"ayuda\" para conocer los posibles comandos.\n\n\n\n\n\n" );
+  printf( "Bares v1.2 20160521\n\tBaltasar el arquero\n\n" );
+  print( "Teclea \"ayuda\" para conocer los posibles comandos.\n\n\n\n\n\n" );
   print( "Un perfecto tiempo de descanso en las profundidades de la estaca "
           "de Bares. Buceando, disfrutando del momento de paz y sosiego que "
           "tan solo las bajas temperaturas a diez metros bajo la superficie "
@@ -69,6 +68,10 @@ int main()
 	Player player;
 	Order * order;
 
+    #ifdef __CPC__
+        cpc_setmode( 2 );
+    #endif
+
 	init_game( &player );
 	play_intro();
 
@@ -103,7 +106,7 @@ int main()
 void set_default_colors()
 {
     #ifdef __CPC__
-        textbackground( BLUE );
+        textbackground( BLACK );
         textcolor( WHITE );
     #else
         textbackground( WHITE );
@@ -145,8 +148,6 @@ char * input(const char * msg)
     #ifndef __CPC__
         set_default_colors();
         textcolor( RED );
-    #else
-        textcolor( YELLOW );
     #endif
 
 	printf( " " );
@@ -161,8 +162,6 @@ char * input(const char * msg)
 
     #ifndef __CPC__
         set_default_colors();
-    #else
-        textcolor( WHITE );
     #endif
 	return buffer;
 }
