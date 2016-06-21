@@ -199,7 +199,7 @@ void resp(Player * player, Order * order)
       && order->obj1->num_loc == 2 )
     {
         intercepted = true;
-        print( "Ahora ya son inservibles." );
+        print( "Ahora ya son inservibles: no puedes usarlas caminando." );
         return;
     }
 
