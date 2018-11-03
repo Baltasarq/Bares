@@ -156,7 +156,7 @@ void cmdGo_doIt(Player * player, Order * order)
 	return;
 }
 
-void cmdHelp_doIt(Player * player, Cmd * cmd)
+void cmdHelp_doIt(Player * player, Order * order)
 {
     printf( "\"Bares\" es un juego basado en texto.\n"
             "Los comandos que se pueden utilizar son:\n"

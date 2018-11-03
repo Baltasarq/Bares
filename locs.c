@@ -177,7 +177,7 @@ void init_locs()
     locs[21].exits[ Exit_West ] = 12;
 
     // Semi pasillo oeste
-    locs[22].desc = "El pasillo dobla de sur a este. "
+    locs[22].desc = "El pasillo dobla de sur a este. ";
     locs[22].exits[ Exit_East ] = 8;
     locs[22].exits[ Exit_South ] = 11;
 

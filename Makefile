@@ -1,41 +1,30 @@
-ARCH=spectrum
 CC=zcc
-CFLAGS_SPECCY=+zx -O3 -SO3 -clib=ansi
-CFLAGS_AMSTRAD=+cpc -O3 -SO3 -clib=ansi
+CFLAGS=+zx -O3 -SO3 -clib=ansi
 
-ifeq ($(ARCH), amstrad)
-	CFLAGS=$(CFLAGS_AMSTRAD)
-else
-	CFLAGS=$(CFLAGS_SPECCY)
-endif
-
-all: bares bares-dsk
+all: bares
 
 bares: bares.c player locs objs cmds
-	$(CC) $(CFLAGS) -create-app bares.c player.obj locs.obj objs.obj cmds.obj -obares -lndos
+	$(CC) $(CFLAGS) -create-app bares.c player.o locs.o objs.o cmds.o -obares -lndos
 	
-bares-dsk: bares
-	ifeq ($(ARCH), amstrad)
-		$(CC) $(CFLAGS) -create-app -subtype=dsk bares
-	endif
-
 player: player.h player.c
-	$(CC) $(CFLAGS) player.c -oplayer.obj
+	$(CC) $(CFLAGS) -c player.c -oplayer.o
 	
 locs: locs.h locs.c
-	$(CC) $(CFLAGS) locs.c -olocs.obj
+	$(CC) $(CFLAGS) -c locs.c -olocs.o
 	
 objs: objs.h objs.c
-	$(CC) $(CFLAGS) objs.c -oobjs.obj
+	$(CC) $(CFLAGS) -c objs.c -oobjs.o
 	
 cmds: cmds.h cmds.c
-	$(CC) $(CFLAGS) cmds.c -ocmds.obj
+	$(CC) $(CFLAGS) -c cmds.c -ocmds.o
 	
 clean:
-	$(RM) *.obj
+	$(RM) *.o
 	$(RM) bares
 	$(RM) *.tap
 	$(RM) *.cpc
+	$(RM) *.dsk
+	$(RM) *.bin
 	$(RM) *.reloc
 
 run:

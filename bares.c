@@ -28,13 +28,15 @@ Order * parse(char * buffer);
 void play_intro()
 {
   cls();
-  printf( "Bares v1.2 20160521\n\tBaltasar el arquero\n\n" );
+  
+  printf( "Bares v1.1 20181102\n\tBaltasar el arquero\n\n" );
   print( "Teclea \"ayuda\" para conocer los posibles comandos.\n\n\n\n\n\n" );
   print( "Un perfecto tiempo de descanso en las profundidades de la estaca "
           "de Bares. Buceando, disfrutando del momento de paz y sosiego que "
           "tan solo las bajas temperaturas a diez metros bajo la superficie "
           "del mar pueden ofrecerte.\n\n"
   );
+  
   input( PROMPT_WAIT );
 }
 
@@ -82,7 +84,6 @@ int main()
         set_default_colors();
 		do_loc_desc( player->num_loc );
 		proc1( &player );
-        //draw(1,1,100,100);
 
 		do {
 			buffer = input( PROMPT );
@@ -105,12 +106,12 @@ int main()
 
 void set_default_colors()
 {
-    #ifdef __CPC__
-        textbackground( BLACK );
-        textcolor( WHITE );
-    #else
+    #ifndef __CPC__
         textbackground( WHITE );
         textcolor( BLUE );
+    #else
+        textbackground( BLACK );
+        textcolor( WHITE );
     #endif
 }
 
