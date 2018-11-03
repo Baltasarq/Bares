@@ -1,15 +1,14 @@
 # Backups
 *~
 *.bak
+
 # Direct executables
 bares
-bares.cpc
-bares.tap
-bares.reloc
 
 # Other
 *.def
 *.bat
+*.reloc
 
 # Executable files
 *.tap
@@ -20,6 +19,7 @@ bares.reloc
 *.ko
 *.obj
 *.elf
+*.bin
 
 # Precompiled Headers
 *.gch
