@@ -3,162 +3,24 @@
 #include "cmds.h"
 #include "locs.h"
 #include "objs.h"
-#include "bool.h"
 
+#include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
 
-#define MSG_DONE "Hecho."
-#define MSG_CANT_DO "No puedes hacer eso."
-#define MSG_CANT_SEE "No ves eso en derredor."
-#define MSG_ALREADY_DONE "Eso ya lo has hecho antes."
-#define MSG_IMPOSSIBLE "Es imposible."
-#define MSG_ALREADY_CARRIED "Pero si ya lo tienes..."
-#define MSG_DONT_CARRIED "No llevas eso contigo."
-#define MSG_SPECIFY_CLOTHING "Debes especificar una prenda."
-
-void cmdGo_doIt(Player * player, Order * order);
-void cmdHelp_doIt(Player * player, Order * order);
-void cmdEnd_doIt(Player * player, Order * order);
-void cmdInv_doIt(Player * player, Order * order);
-void cmdNop_doIt(Player * player, Order * order);
-void cmdEx_doIt(Player * player, Order * order);
-void cmdTake_doIt(Player * player, Order * order);
-void cmdDrop_doIt(Player * player, Order * order);
-void cmdSwim_doIt(Player * player, Order * order);
-void cmdExits_doIt(Player * player, Order * order);
-void cmdWear_doIt(Player * player, Order * order);
-void cmdDisrobe_doIt(Player * player, Order * order);
-void cmdWait_doIt(Player * player, Order * order);
-void cmdBreak_doIt(Player * player, Order * order);
-void cmdPush_doIt(Player * player, Order * order);
-
-Cmd cmds[NUM_CMDS];
-Cmd * cmdNop;
-
-void init_cmds()
-{
-    // North
-    cmds[0].cmdId = Cmd_North;
-    cmds[0].doIt = cmdGo_doIt;
-    cmds[0].words = " n norte ";
-
-    // South
-    cmds[1].cmdId = Cmd_South;
-    cmds[1].doIt = cmdGo_doIt;
-    cmds[1].words = " s sur ";
-
-    // East
-    cmds[2].cmdId = Cmd_East;
-    cmds[2].doIt = cmdGo_doIt;
-    cmds[2].words = " e este ";
-
-    // West
-    cmds[3].cmdId = Cmd_West;
-    cmds[3].doIt = cmdGo_doIt;
-    cmds[3].words = " o oeste ";
-
-    // Up
-    cmds[4].cmdId = Cmd_Up;
-    cmds[4].doIt = cmdGo_doIt;
-    cmds[4].words = " subir sube subo arrib ";
-
-    // Down
-    cmds[5].cmdId = Cmd_Down;
-    cmds[5].doIt = cmdGo_doIt;
-    cmds[5].words = " bajar baja bajo abajo ";
+#define RELEASE 1
 
 
-    // End
-    cmds[6].cmdId = Cmd_End;
-    cmds[6].doIt = cmdEnd_doIt;
-    cmds[6].words = " fin termi end quit sal salir ";
-
-    // Help
-    cmds[7].cmdId = Cmd_Help;
-    cmds[7].doIt = cmdHelp_doIt;
-    cmds[7].words = " ayuda help ";
-
-    // Inventory
-    cmds[8].cmdId = Cmd_Inventory;
-    cmds[8].doIt = cmdInv_doIt;
-    cmds[8].words = " i inv inven ";
-
-    // Examine
-    cmds[9].cmdId = Cmd_Examine;
-    cmds[9].doIt = cmdEx_doIt;
-    cmds[9].words = " ex exami ";
-
-    // Exits
-    cmds[10].cmdId = Cmd_Exits;
-    cmds[10].doIt = cmdExits_doIt;
-    cmds[10].words = " x salid ";
-
-    // Take
-    cmds[11].cmdId = Cmd_Take;
-    cmds[11].doIt = cmdTake_doIt;
-    cmds[11].words = " coger coge cojo ";
-
-    // Drop
-    cmds[12].cmdId = Cmd_Drop;
-    cmds[12].doIt = cmdDrop_doIt;
-    cmds[12].words = " dejar deja dejo tira tiro ";
-
-    // Swim
-    cmds[13].cmdId = Cmd_Swim;
-    cmds[13].doIt = cmdSwim_doIt;
-    cmds[13].words = " nadar nada nado bucear bucea buceo ";
-
-    // Wear
-    cmds[14].cmdId = Cmd_Wear;
-    cmds[14].doIt = cmdWear_doIt;
-    cmds[14].words = " poner pon ponte pongo vesti visto ";
-
-    // Disrobe
-    cmds[15].cmdId = Cmd_Disrobe;
-    cmds[15].doIt = cmdDisrobe_doIt;
-    cmds[15].words = " quita quito desve desvi ";
-
-    // Wait
-    cmds[16].cmdId = Cmd_Wait;
-    cmds[16].doIt = cmdWait_doIt;
-    cmds[16].words = " esper z ";
-
-    // Break
-    cmds[17].cmdId = Cmd_Break;
-    cmds[17].doIt = cmdBreak_doIt;
-    cmds[17].words = " rompe rompo patea pateo golpe mata mato pega pego"
-                     " ataca ataco ";
-
-    // Push, move
-    cmds[18].cmdId = Cmd_Push;
-    cmds[18].doIt = cmdPush_doIt;
-    cmds[18].words = " empuj pulsa pulso mueve muevo ";
-
-    // Nop
-    cmdNop = &cmds[NUM_CMDS - 1];
-    cmds[NUM_CMDS - 1].cmdId = Cmd_Nop;
-    cmds[NUM_CMDS - 1].doIt = cmdNop_doIt;
-    cmds[NUM_CMDS - 1].words = "nop";
-}
-
-void cmdGo_doIt(Player * player, Order * order)
-{
-	int dest_loc = locs[ player->num_loc ].exits[ order->cmd->cmdId ];
-
-	if ( dest_loc >= 0 ) {
-		player->num_loc = dest_loc;
-	} else {
-		printf( "No se puede ir en ese rumbo." );
-	}
-
-	return;
-}
-
-void cmdHelp_doIt(Player * player, Order * order)
-{
-    printf( "\"Bares\" es un juego basado en texto.\n"
+const char * MSG_DONE = "Hecho.";
+const char * MSG_CANT_DO = "No puedes hacer eso.";
+const char * MSG_CANT_SEE = "No ves eso en derredor.";
+const char * MSG_ALREADY_DONE = "Eso ya lo has hecho antes.";
+const char * MSG_IMPOSSIBLE = "Es imposible.";
+const char * MSG_ALREADY_CARRIED = "Pero si ya lo tienes...";
+const char * MSG_DONT_CARRIED = "No llevas eso contigo.";
+const char * MSG_SPECIFY_CLOTHING = "Debes especificar una prenda.";
+const char * MSG_HELP = "\"Bares\" es un juego basado en texto.\n"
             "Los comandos que se pueden utilizar son:\n"
             "\t\"fin\":            termina el juego.\n"
             "\t\"ayuda\":          muestra esta ayuda.\n"
@@ -177,15 +39,163 @@ void cmdHelp_doIt(Player * player, Order * order)
             "\t\"quitate x\":      quitarse un objeto 'x' ya puesto.\n"
             "\t\"rompe x\":        rompe un objeto 'x'.\n"
             "\t\"empuja x\":       empuja un objeto 'x'.\n"
-            "\t\"ataca x\":        ataca a 'x'.\n\n"
-    );
+            "\t\"ataca x\":        ataca a 'x'.\n\n";
+
+void cmdGo_doIt(Player * player, Order * order);
+void cmdHelp_doIt(Player * player, Order * order);
+void cmdEnd_doIt(Player * player, Order * order);
+void cmdInv_doIt(Player * player, Order * order);
+void cmdNop_doIt(Player * player, Order * order);
+void cmdEx_doIt(Player * player, Order * order);
+void cmdTake_doIt(Player * player, Order * order);
+void cmdDrop_doIt(Player * player, Order * order);
+void cmdSwim_doIt(Player * player, Order * order);
+void cmdExits_doIt(Player * player, Order * order);
+void cmdWear_doIt(Player * player, Order * order);
+void cmdDisrobe_doIt(Player * player, Order * order);
+void cmdWait_doIt(Player * player, Order * order);
+void cmdBreak_doIt(Player * player, Order * order);
+void cmdPush_doIt(Player * player, Order * order);
+void cmdDbg_doIt(Player * player, Order * order);
+
+Cmd cmds[NumCmds];
+Cmd * cmdNop;
+
+void init_cmds()
+{
+    // North
+    cmds[0].cmdId = CmdNorth;
+    cmds[0].doIt = cmdGo_doIt;
+    cmds[0].words = " n norte ";
+
+    // South
+    cmds[1].cmdId = CmdSouth;
+    cmds[1].doIt = cmdGo_doIt;
+    cmds[1].words = " s sur ";
+
+    // East
+    cmds[2].cmdId = CmdEast;
+    cmds[2].doIt = cmdGo_doIt;
+    cmds[2].words = " e este ";
+
+    // West
+    cmds[3].cmdId = CmdWest;
+    cmds[3].doIt = cmdGo_doIt;
+    cmds[3].words = " o oeste ";
+
+    // Up
+    cmds[4].cmdId = CmdUp;
+    cmds[4].doIt = cmdGo_doIt;
+    cmds[4].words = " subir sube subo arrib ";
+
+    // Down
+    cmds[5].cmdId = CmdDown;
+    cmds[5].doIt = cmdGo_doIt;
+    cmds[5].words = " bajar baja bajo abajo ";
+
+
+    // End
+    cmds[6].cmdId = CmdEnd;
+    cmds[6].doIt = cmdEnd_doIt;
+    cmds[6].words = " fin termi end quit sal salir ";
+
+    // Help
+    cmds[7].cmdId = CmdHelp;
+    cmds[7].doIt = cmdHelp_doIt;
+    cmds[7].words = " ayuda help ";
+
+    // Inventory
+    cmds[8].cmdId = CmdInventory;
+    cmds[8].doIt = cmdInv_doIt;
+    cmds[8].words = " i inv inven ";
+
+    // Examine
+    cmds[9].cmdId = CmdExamine;
+    cmds[9].doIt = cmdEx_doIt;
+    cmds[9].words = " ex exami ";
+
+    // Exits
+    cmds[10].cmdId = CmdExits;
+    cmds[10].doIt = cmdExits_doIt;
+    cmds[10].words = " x salid ";
+
+    // Take
+    cmds[11].cmdId = CmdTake;
+    cmds[11].doIt = cmdTake_doIt;
+    cmds[11].words = " coger coge cojo ";
+
+    // Drop
+    cmds[12].cmdId = CmdDrop;
+    cmds[12].doIt = cmdDrop_doIt;
+    cmds[12].words = " dejar deja dejo tira tiro ";
+
+    // Swim
+    cmds[13].cmdId = CmdSwim;
+    cmds[13].doIt = cmdSwim_doIt;
+    cmds[13].words = " nadar nada nado bucear bucea buceo ";
+
+    // Wear
+    cmds[14].cmdId = CmdWear;
+    cmds[14].doIt = cmdWear_doIt;
+    cmds[14].words = " poner pon ponte pongo vesti visto ";
+
+    // Disrobe
+    cmds[15].cmdId = CmdDisrobe;
+    cmds[15].doIt = cmdDisrobe_doIt;
+    cmds[15].words = " quita quito desve desvi ";
+
+    // Wait
+    cmds[16].cmdId = CmdWait;
+    cmds[16].doIt = cmdWait_doIt;
+    cmds[16].words = " esper z ";
+
+    // Break
+    cmds[17].cmdId = CmdBreak;
+    cmds[17].doIt = cmdBreak_doIt;
+    cmds[17].words = " rompe rompo patea pateo golpe mata mato pega pego"
+                     " ataca ataco ";
+
+    // Push, move
+    cmds[18].cmdId = CmdPush;
+    cmds[18].doIt = cmdPush_doIt;
+    cmds[18].words = " empuj pulsa pulso mueve muevo ";
+    
+    // Debug
+    cmds[19].cmdId = CmdDbg;
+    cmds[19].doIt = cmdDbg_doIt;
+    cmds[19].words = " _dbg ";
+
+    // Nop
+    cmdNop = &cmds[NumCmds - 1];
+    cmds[NumCmds - 1].cmdId = Cmd_Nop;
+    cmds[NumCmds - 1].doIt = cmdNop_doIt;
+    cmds[NumCmds - 1].words = "nop";
+}
+
+void cmdGo_doIt(Player * player, Order * order)
+{
+	int dest_loc = locs[ player->num_loc ].exits[ order->cmd->cmdId ];
+
+	if ( dest_loc < NumLocs ) {
+		player->num_loc = dest_loc;
+	} else {
+		printf( "No se puede tomar ese rumbo." );
+	}
+
+	return;
+}
+
+void cmdHelp_doIt(Player * player, Order * order)
+{
+    printf( MSG_HELP );
     input( PROMPT_WAIT );
 }
 
 void cmdEnd_doIt(Player * player, Order * order)
 {
-    if ( ask_yes_no( "Seguro? (s/n): " ) ) {
-        restart( player );
+    if ( ask_yes_no( "Confirma que deseas terminar (s/n): " ) ) {
+        cls();
+        exit( 0 );
     } else {
         printf( "\n" );
     }
@@ -210,7 +220,7 @@ void cmdInv_doIt(Player * player, Order * order)
 
 void cmdEx_doIt(Player * player, Order * order)
 {
-	char * msg = "No ves eso en derredor.";
+	char * msg = "No ves eso en derredor. O no te parece importante.";
 
 //	printf("NumLoc: %d, Object: %d, Object's NumLoc: %d\n",
 //				player->num_loc, order->obj1, order->obj1->num_loc );
@@ -233,15 +243,15 @@ void cmdExits_doIt(Player * player, Order * order)
         "arriba", "abajo"
     };
 
-    bool hay_salidas = 0;
+    bool hay_salidas = false;
     int i = 0;
     Loc * loc = &locs[ player->num_loc ];
 
     printf( "Salidas visibles: " );
-    for(i; i < NUM_EXITS; ++i) {
-        if ( loc->exits[i] >= 0 ) {
-          hay_salidas = 1;
-          printf( "%s ", salidas[i] );
+    for(; i < NumExits; ++i) {
+        if ( loc->exits[ i ] < NumLocs ) {
+          hay_salidas = true;
+          printf( "%s ", salidas[ i ] );
         }
     }
 
@@ -370,6 +380,40 @@ void cmdBreak_doIt(Player * player, Order * order)
 void cmdPush_doIt(Player * player, Order * order)
 {
     print( "No tiene sentido." );
+}
+
+void cmdDbg_doIt(Player * player, Order * order)
+{
+#ifndef RELEASE
+    static char buffer[30];
+    int i;
+
+    printf( "Dbg Info\n" );
+
+    // Num loc
+    strcpy( buffer, "Player loc: " );
+    itoa( player->num_loc, buffer + strlen( buffer ), 10 );
+    printf( "%s\n", buffer );
+    
+    // Objects
+    for(i = 0; i < NumObjs; ++i) {
+        itoa( i, buffer, 10 );
+        strcpy( buffer + strlen( buffer ), " " );
+        strcpy( buffer + strlen( buffer ), objs[ i ].id );
+        strcpy( buffer + strlen( buffer ), " @" );
+        itoa( objs[ i ].num_loc, buffer + strlen( buffer ), 10 );
+        
+        if ( i % 5 == 0 ) {
+            input( "ENTER..." );
+        }
+        
+        printf( "%s\n", buffer );
+    }
+#else
+    print( MSG_CANT_DO );
+#endif
+    
+    return;
 }
 
 void cmdNop_doIt(Player * player, Order * order)

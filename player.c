@@ -2,12 +2,15 @@
 
 #include "player.h"
 #include "objs.h"
-#include "bool.h"
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+
+
+const int MAX_INV_OBJS = 4;
 
 /** Inits the game
   * @param player The player structure
@@ -68,16 +71,38 @@ bool ask_yes_no(const char * msg)
   */
 void proc1(Player * player)
 {
+    const Obj * ObjMar = locate_obj_by_id( "mar" );
+    const Obj * ObjWalls = locate_obj_by_id( "muros" );
+    const Obj * ObjAletas = locate_obj_by_id( "aletas" );
+    const Obj * ObjTarjeta = locate_obj_by_id( "tarjeta" );
+    const Obj * ObjEscalerilla = locate_obj_by_id( "escalerilla" );
+    const Obj * ObjSilla = locate_obj_by_id( "silla" );
+    const Obj * ObjMesa = locate_obj_by_id( "mesa" );
+    const Obj * ObjArchivador = locate_obj_by_id( "archivador" );
+    const Obj * ObjPolvo = locate_obj_by_id( "polvo" );
+    const Obj * ObjBaldas = locate_obj_by_id( "baldas" );
+    const Obj * ObjPuertas = locate_obj_by_id( "puertas" );
+
     static bool isSubDesc = false;
-    Obj * obj_aletas = locate_obj_by_id( "aletas" );
-    Obj * obj_tarjeta = locate_obj_by_id( "tarjeta" );
+    
+    // You take the concrete walls, ceiling and floor wherever you go.
+    ObjWalls->num_loc = LIMBO;
+    if ( player->num_loc > 0 ) {
+        ObjWalls->num_loc = player->num_loc;
+    }
 
-	// You take the sea with you (yeah!)
+	// Take the sea with you (yeah, baby!), while in the sea & docks
 	if ( player->num_loc <= 7 ) {
-        Obj * obj_mar = locate_obj_by_id( "mar" );
-
-		obj_mar->num_loc = player->num_loc;
+		ObjMar->num_loc = player->num_loc;
 	}
+	
+	// The stairs are found in loc #5 (dock D-3) and loc #2 (first dock)
+	if ( player->num_loc == 2
+      || player->num_loc == 5
+      || player->num_loc == 14 )
+    {
+        ObjEscalerilla->num_loc = player->num_loc;
+    }
 
 	// Initial message about the submarine
 	if ( !isSubDesc
@@ -90,41 +115,41 @@ void proc1(Player * player)
 
 	// You leave your equipment in the first loc of the base
 	if ( player->num_loc == 2
-	  && obj_aletas->num_loc == PLAYER_NUM_LOC )
+	  && ObjAletas->num_loc == PLAYER_NUM_LOC )
 	{
 		print( "Incapaz de utilizarlas caminando, dejas las aletas en el suelo." );
-		obj_aletas->num_loc = 2;
+		ObjAletas->num_loc = 2;
 	}
 
     // Move office furniture when needed.
     if ( player->num_loc == 16
       || player->num_loc == 17 )
     {
-        Obj * obj_silla = locate_obj_by_id( "silla" );
-        Obj * obj_mesa = locate_obj_by_id( "mesa" );
-        Obj * obj_archivador = locate_obj_by_id( "archivador" );
-
-        obj_silla->num_loc = player->num_loc;
-        obj_mesa->num_loc = player->num_loc;
-        obj_archivador->num_loc = player->num_loc;
+        ObjSilla->num_loc = player->num_loc;
+        ObjMesa->num_loc = player->num_loc;
+        ObjArchivador->num_loc = player->num_loc;
     }
 
     // Move dust around
-    if ( player->num_loc >= 9 ) {
-        locate_obj_by_id( "polvo" )->num_loc = player->num_loc;
+    if ( player->num_loc >= 9 ) {        
+        ObjPolvo->num_loc = player->num_loc;
     }
 
     // Move shelves
     if ( player->num_loc == 18
       || player->num_loc == 19 )
     {
-        Obj * obj_baldas = locate_obj_by_id( "baldas" );
-        obj_baldas->num_loc = player->num_loc;
+        ObjBaldas->num_loc = player->num_loc;
+    }
+    
+    // Move the doors with you
+    if ( player->num_loc >= 8 ) {
+        ObjPuertas->num_loc = player->num_loc;
     }
 
     // End of game?
     if ( player->num_loc == 10
-      && obj_tarjeta->num_loc == PLAYER_NUM_LOC )
+      && ObjTarjeta->num_loc == PLAYER_NUM_LOC )
     {
         end_game( player );
     }
@@ -155,38 +180,42 @@ void proc2(Player * player)
 		printf( "\n" );
 		player->num_loc = 2;
 	}
+	
+	return;
 }
 
 void resp(Player * player, Order * order)
 {
+    const Obj * ObjTraje = locate_obj_by_id( "traje" );
+    const Obj * ObjLancha = locate_obj_by_id( "lancha" );
+    const Obj * ObjAletas = locate_obj_by_id( "aletas" );
+    const Obj * ObjEscotilla = locate_obj_by_id( "escotilla" );
+    const Obj * ObjMesa = locate_obj_by_id( "mesa" );
+    const Obj * ObjDocs = locate_obj_by_id( "documentos" );
+    const Obj * ObjArchivador = locate_obj_by_id( "archivador" );
+    const Obj * ObjLlave = locate_obj_by_id( "llave" );
+    const Obj * ObjMartillo = locate_obj_by_id( "martillo" );
+    const Obj * ObjBaldas = locate_obj_by_id( "baldas" );
+    const Obj * ObjCaja = locate_obj_by_id( "caja" );
+    const Obj * ObjBotonera = locate_obj_by_id( "botonera" );
+    
     static bool caja_abierta = false;
     bool intercepted = false;
 
-    Obj * obj_lancha = locate_obj_by_id( "lancha" );
-    Obj * obj_aletas = locate_obj_by_id( "aletas" );
-    Obj * obj_escotilla = locate_obj_by_id( "escotilla" );
-    Obj * obj_mesa = locate_obj_by_id( "mesa" );
-    Obj * obj_docs = locate_obj_by_id( "documentos" );
-    Obj * obj_archivador = locate_obj_by_id( "archivador" );
-    Obj * obj_llave = locate_obj_by_id( "llave" );
-    Obj * obj_martillo = locate_obj_by_id( "martillo" );
-    Obj * obj_baldas = locate_obj_by_id( "baldas" );
-    Obj * obj_caja = locate_obj_by_id( "caja" );
-    Obj * obj_botonera = locate_obj_by_id( "botonera" );
-
     // Quitate el traje
-    if ( order->cmd->cmdId == Cmd_Disrobe
-      && !strcmp( order->obj1->id, "traje" ) )
+    if ( order->cmd->cmdId == CmdDisrobe
+      && order->obj1 == ObjTraje )
     {
         intercepted = true;
         print( "No es buena idea, teniendo en cuenta las bajas temperaturas." );
         return;
     }
 
+
     // Deja o quitate las aletas
-    if ( ( order->cmd->cmdId == Cmd_Disrobe
-	|| order->cmd->cmdId == Cmd_Drop )
-      && order->obj1 == obj_aletas )
+    if ( order->cmd->cmdId == CmdDisrobe 
+      && order->obj1 == ObjAletas
+      && ObjAletas->num_loc == PLAYER_NUM_LOC )
     {
         intercepted = true;
         print( "No, las necesitas para nadar." );
@@ -194,8 +223,8 @@ void resp(Player * player, Order * order)
     }
 
     // Coge las aletas
-    if ( order->cmd->cmdId == Cmd_Take
-      && order->obj1 == obj_aletas
+    if ( order->cmd->cmdId == CmdTake
+      && order->obj1 == ObjAletas
       && order->obj1->num_loc == 2 )
     {
         intercepted = true;
@@ -204,43 +233,45 @@ void resp(Player * player, Order * order)
     }
 
     // Intenta subir
-    if ( order->cmd->cmdId == Cmd_Up
+    if ( order->cmd->cmdId == CmdUp
       && player->num_loc == 5 )
     {
-        if ( obj_lancha->num_loc != 5 ) {
+        if ( ObjLancha->num_loc != 5 ) {
             intercepted = true;
             print( "No, no, te vas a cortar los pies." );
             return;
         } else {
-            print( "Subiendo por encima de la lancha, por fin asciendes por la escalerilla." );
+            print( "Trepando por encima de la lancha, "
+                   "consigues ascender por la escalerilla." );
         }
     }
 
     // Deja la lancha
-    if ( order->cmd->cmdId == Cmd_Drop
+    if ( order->cmd->cmdId == CmdDrop
       && player->num_loc == 5
-      && order->obj1 == obj_lancha )
+      && order->obj1 == ObjLancha )
     {
         print( "Tratas de colocar la lancha tapando los cristales..." );
     }
 
     // Examinas la escotilla del submarino
-    if ( order->cmd->cmdId == Cmd_Examine
+    if ( order->cmd->cmdId == CmdExamine
       && player->num_loc == 7
-      && order->obj1 == obj_escotilla
-      && obj_lancha->num_loc == LIMBO )
+      && order->obj1 == ObjEscotilla
+      && ObjLancha->num_loc == LIMBO )
     {
         intercepted = true;
-        print( "Abres la escotilla, que resulta ser un panel, y de su "
+        print( "Repasas todas las escotillas de la torre, y abres la "
+               "que es practicable. Resulta ser un panel, y de su "
                "interior extraes una reducida lancha de salvamento." );
-        obj_lancha->num_loc = 7;
+        ObjLancha->num_loc = 7;
         return;
     }
 
     // Examinar la mesa del despacho del general
     if ( player->num_loc == 16
-      && order->cmd->cmdId == Cmd_Examine
-      && order->obj1 == obj_mesa )
+      && order->cmd->cmdId == CmdExamine
+      && order->obj1 == ObjMesa )
     {
         print( "Sobre ella, hay unos documentos." );
         intercepted = true;
@@ -248,8 +279,8 @@ void resp(Player * player, Order * order)
 
     // Intentar coger los papeles
     if ( player->num_loc == 16
-      && order->cmd->cmdId == Cmd_Take
-      && order->obj1 == obj_docs )
+      && order->cmd->cmdId == CmdTake
+      && order->obj1 == ObjDocs )
     {
         print( "Prefiero no cogerlos, parecen demasiado importantes." );
         intercepted = true;
@@ -257,19 +288,19 @@ void resp(Player * player, Order * order)
 
     // Hacer aparecer la llave en el despacho del secre
     if ( player->num_loc == 17
-      && order->cmd->cmdId == Cmd_Examine
-      && order->obj1 == obj_archivador
-      && obj_llave->num_loc == LIMBO )
+      && order->cmd->cmdId == CmdExamine
+      && order->obj1 == ObjArchivador
+      && ObjLlave->num_loc == LIMBO )
     {
         print( "Encima del archivador, encuentras una llave." );
-        obj_llave->num_loc = 17;
+        ObjLlave->num_loc = 17;
         intercepted = true;
     }
 
     if ( player->num_loc == 23
-      && order->cmd->cmdId == Cmd_West )
+      && order->cmd->cmdId == CmdWest )
     {
-        if ( obj_llave->num_loc != PLAYER_NUM_LOC ) {
+        if ( ObjLlave->num_loc != PLAYER_NUM_LOC ) {
             print( "Cerrada. Necesitas una llave." );
             intercepted = true;
         } else {
@@ -279,19 +310,19 @@ void resp(Player * player, Order * order)
 
     // Hacer aparecer el martillo en el archivo
     if ( player->num_loc == 19
-      && order->cmd->cmdId == Cmd_Examine
-      && order->obj1 == obj_baldas
-      && obj_martillo->num_loc == LIMBO )
+      && order->cmd->cmdId == CmdExamine
+      && order->obj1 == ObjBaldas
+      && ObjMartillo->num_loc == LIMBO )
     {
         intercepted = true;
-        obj_martillo->num_loc = 19;
+        ObjMartillo->num_loc = 19;
         print( "Has encontrado un martillo encima de una balda." );
     }
 
     // Pulsa en el ascensor
     if ( player->num_loc == 10
-      && order->cmd->cmdId == Cmd_Push
-      && order->obj1 == obj_botonera )
+      && order->cmd->cmdId == CmdPush
+      && order->obj1 == ObjBotonera )
     {
         intercepted = true;
         print( "No sucede nada. Hay una ranura debajo... es necesario meter algo." );
@@ -299,13 +330,13 @@ void resp(Player * player, Order * order)
 
     // Rompe la caja
     if ( player->num_loc == 18
-      && order->cmd->cmdId == Cmd_Break
-      && order->obj1 == obj_caja )
+      && order->cmd->cmdId == CmdBreak
+      && order->obj1 == ObjCaja )
     {
         intercepted = true;
 
         if ( !caja_abierta ) {
-            if ( obj_martillo->num_loc != PLAYER_NUM_LOC ) {
+            if ( ObjMartillo->num_loc != PLAYER_NUM_LOC ) {
                 print( "No puedes hacerlo con las manos desnudas." );
             } else {
                 caja_abierta = true;
@@ -318,21 +349,21 @@ void resp(Player * player, Order * order)
 
     // Examina la caja
     if ( player->num_loc == 18
-      && order->cmd->cmdId == Cmd_Examine
-      && order->obj1 == obj_caja )
+      && order->cmd->cmdId == CmdExamine
+      && order->obj1 == ObjCaja )
     {
-        Obj * obj_tarjeta = locate_obj_by_id( "tarjeta" );
+        Obj * ObjTarjeta = locate_obj_by_id( "tarjeta" );
 
 
         if ( caja_abierta ) {
             intercepted = true;
-            print( obj_caja->desc );
+            print( ObjCaja->desc );
             print( "Su contenido se desparrama en derredor." );
 
-            if ( obj_tarjeta->num_loc == LIMBO ) {
+            if ( ObjTarjeta->num_loc == LIMBO ) {
                 print( "Hay muchos papeles, y piezas, pero no ves nada de "
                         "utilidad real... excepto una tarjeta." );
-                obj_tarjeta->num_loc = 18;
+                ObjTarjeta->num_loc = 18;
             }
         }
     }

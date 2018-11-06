@@ -4,14 +4,19 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
-Obj objs[NUM_OBJS];
+
+const int PLAYER_NUM_LOC = -128;
+const int LIMBO = -129;
+
+Obj objs[NumObjs];
 
 void init_objs()
 {
     int i = 0;
 
-    for(; i < NUM_OBJS; ++i) {
+    for(; i < NumObjs; ++i) {
         objs[ i ].id = NULL;
         objs[ i ].num_loc = 0;
         objs[ i ].atr = Static;
@@ -46,7 +51,7 @@ void init_objs()
 	objs[ 3 ].num_loc = 2;
 	objs[ 3 ].atr = Static;
 	objs[ 3 ].words = " escal ";
-	objs[ 3 ].desc = "Incrustada en el cemento del muelle.";
+	objs[ 3 ].desc = "Incrustada en el cemento.";
 
 	objs[ 4 ].id = "aletas";
 	objs[ 4 ].num_loc = PLAYER_NUM_LOC;
@@ -67,8 +72,9 @@ void init_objs()
     objs[ 6 ].id = "cristales";
 	objs[ 6 ].num_loc = 5;
 	objs[ 6 ].atr = Static;
-	objs[ 6 ].words = " crist luz luces panta ";
-	objs[ 6 ].desc = "Solo cristales rotos por el suelo.";
+	objs[ 6 ].words = " crist luz luces panta techo suelo ";
+	objs[ 6 ].desc = "De las luces del techo solo quedan cristales rotos, "
+                     "esparcidos por el suelo.";
 
     // La lancha del submarino
     objs[ 7 ].id = "lancha";
@@ -81,7 +87,7 @@ void init_objs()
     objs[ 8 ].id = "escotilla";
 	objs[ 8 ].num_loc = 7;
 	objs[ 8 ].atr = Static;
-	objs[ 8 ].words = " escot porti pane ";
+	objs[ 8 ].words = " escot porti pane subma torre barco navio ";
 	objs[ 8 ].desc = "Una escotilla de la torre del submarino.";
 
     // Documentos en la mesa del comandante
@@ -92,12 +98,13 @@ void init_objs()
 	objs[ 9 ].desc = "Parece un comunicado oficial. Se trata de un tipo de "
                         "trabajo... fechado para hoy mismo. No puede ser. "
                         "Es... imposible.\n"
-                        "'Operation Phoenix'\n"
+                        "\"Operation Phoenix\n"
                         " -----------------\n"
-                        "'In april 2016 the U-530 submarine will arrive to the base "
+                        "In april 2016 the U-530 submarine will arrive to the base "
                         "with the most important guest on board. "
                         "LORAM base will support the startings of the WCM mission, "
-                        "and provide assistance when needed.'\n\n"
+                        "and provide assistance when needed.\"\n\n"
+                        "Un submarino... va a llegar... este mes.\n"
                         "Interesante, cuando menos...";
 
     // La mesa
@@ -167,7 +174,7 @@ void init_objs()
     objs[ 19 ].id = "baldas";
 	objs[ 19 ].num_loc = 19;
 	objs[ 19 ].atr = Static;
-	objs[ 19 ].words = " balda estan legaj papel ";
+	objs[ 19 ].words = " balda estan legaj papel archi ";
 	objs[ 19 ].desc = "Todo polvoriento.";
 
     // Caja de madera
@@ -175,7 +182,8 @@ void init_objs()
 	objs[ 20 ].num_loc = 18;
 	objs[ 20 ].atr = Static;
 	objs[ 20 ].words = " caja mader conte ";
-	objs[ 20 ].desc = "Una caja de madera. Hay una etiqueta de destino, fechada, ha llegado... hoy.";
+	objs[ 20 ].desc = "Una caja de madera. "
+                      "Hay una etiqueta de destino, fechada, ha llegado... hoy.";
 
     // Tarjeta
     objs[ 21 ].id = "tarjeta";
@@ -198,12 +206,26 @@ void init_objs()
 	objs[ 23 ].words = " maqui motor palan engra ";
 	objs[ 23 ].desc = "Maquinaria oxidada y polvorienta.";
 
-     // Muelles
+     // Vista de los muelles
     objs[ 24 ].id = "muelles";
 	objs[ 24 ].num_loc = 15;
 	objs[ 24 ].atr = Static;
-	objs[ 24 ].words = " muell ";
+	objs[ 24 ].words = " muell subma navio barco vista ";
 	objs[ 24 ].desc = "Se aprecia muy bien el submarino desde este punto.";
+    
+     // Suelo, techos y paredes de cemento
+    // (debe estar al final, para tener menos prioridad)
+    objs[ 25 ].id = "muros";
+	objs[ 25 ].num_loc = 2;
+	objs[ 25 ].atr = Static;
+	objs[ 25 ].words = " muell cemen suelo techo pared muro muros ";
+	objs[ 25 ].desc = "Todo ha sido fabricado en gris cemento.";
+    
+    objs[ 26 ].id = "puertas";
+	objs[ 26 ].num_loc = 8;
+	objs[ 26 ].atr = Static;
+	objs[ 26 ].words = " puert ";
+	objs[ 26 ].desc = "Funcionales puertas de acero.";
 }
 
 int how_many_objs_in(int num_loc)
@@ -211,7 +233,7 @@ int how_many_objs_in(int num_loc)
 	int toret = 0;
 	int i = 0;
 
-	for(; i < NUM_OBJS; ++i) {
+	for(; i < NumObjs; ++i) {
 		Obj * obj = &objs[ i ];
 
 		if ( obj->atr != Static
@@ -229,7 +251,7 @@ int list_objs_in(int num_loc)
 	int toret = 0;
 	int i = 0;
 
-	for(; i < NUM_OBJS; ++i) {
+	for(; i < NumObjs; ++i) {
 		Obj * obj = &objs[ i ];
 
 		if ( obj->atr != Static
@@ -255,11 +277,16 @@ Obj * locate_obj_by_id(const char * id)
     Obj * toret = NULL;
     int i = 0;
 
-	for(; i < NUM_OBJS; ++i) {
+	for(; i < NumObjs; ++i) {
         if ( !strcmp( objs[ i ].id, id ) ) {
             toret = &objs[ i ];
             break;
         }
+    }
+    
+    if ( toret == NULL ) {
+        fprintf( stderr, "*** ERROR: Unable to find: '%s'\n", id );
+        exit( EXIT_FAILURE );
     }
 
     return toret;

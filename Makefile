@@ -28,4 +28,4 @@ clean:
 	$(RM) *.reloc
 
 run:
-	fuse bares.tap
+	fuse bares.tap &

@@ -4,13 +4,12 @@
 #define _INCLUDE_PLAYER_H
 
 #include "cmds.h"
-#include <bool.h>
 
-#define MAX_INV_OBJS 4
+extern const int MAX_INV_OBJS;
 
 typedef struct _Player {
-	int num_loc;
-	int num_turns;
+    int num_loc;
+    int num_turns;
 } Player;
 
 extern void init_game(Player *);

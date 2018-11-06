@@ -3,10 +3,12 @@
 #ifndef _INCLUDE_OBJS_H
 #define _INCLUDE_OBJS_H
 
-#include "bool.h"
-#define NUM_OBJS 25
-#define PLAYER_NUM_LOC -128
-#define LIMBO -129
+#include <stdbool.h>
+
+typedef enum _objLimits { NumObjs = 27 } ObjLimits;
+
+extern const int PLAYER_NUM_LOC;
+extern const int LIMBO;
 
 typedef enum _Atr {
 	Static, Portable, Clothing

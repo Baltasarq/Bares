@@ -3,26 +3,26 @@
 #ifndef _INCLUDE_CMDS_H
 #define _INCLUDE_CMDS_H
 
-#define LENGTH_WORD 5
-#define NUM_CMDS 20
-
 #include "objs.h"
 
+typedef enum _cmdLimits { LengthWord = 5, NumCmds = 21 } CmdLimits;
+
 typedef enum _CmdId {
-	Cmd_North, Cmd_South, Cmd_East, Cmd_West, Cmd_Up, Cmd_Down,
-	Cmd_End,
-	Cmd_Help,
-	Cmd_Inventory,
-	Cmd_Examine,
-	Cmd_Exits,
-	Cmd_Take,
-	Cmd_Drop,
-	Cmd_Swim,
-	Cmd_Wear,
-	Cmd_Disrobe,
-    Cmd_Wait,
-    Cmd_Break,
-    Cmd_Push,
+	CmdNorth, CmdSouth, CmdEast, CmdWest, CmdUp, CmdDown,
+	CmdEnd,
+	CmdHelp,
+	CmdInventory,
+	CmdExamine,
+	CmdExits,
+	CmdTake,
+	CmdDrop,
+	CmdSwim,
+	CmdWear,
+	CmdDisrobe,
+    CmdWait,
+    CmdBreak,
+    CmdPush,
+    CmdDbg,
 
 	Cmd_Nop
 } CmdId;

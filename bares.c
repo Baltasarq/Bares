@@ -3,19 +3,16 @@
 #include <string.h>
 #include <conio.h>
 #include <ctype.h>
-
-#ifdef __CPC__
-    #include "cpc.h"
-#endif
+#include <stdbool.h>
 
 #include "player.h"
 #include "cmds.h"
 #include "locs.h"
 #include "objs.h"
-#include "bool.h"
+
 
 /* Constants */
-const int MAX_COL = 64;
+const int MAX_COL = 65;
 const char * PROMPT = ":> ";
 const char * PROMPT_WAIT = "Pulsa ENTER...";
 
@@ -23,14 +20,20 @@ const char * PROMPT_WAIT = "Pulsa ENTER...";
 void cls();
 char * input(const char *);
 void print(const char * txt);
-Order * parse(char * buffer);
+Order * parse(Player * player, char * buffer);
 
 void play_intro()
 {
   cls();
   
-  printf( "Bares v1.1 20181102\n\tBaltasar el arquero\n\n" );
+  textcolor( BLACK );
+  
+  printf( "Bares v1.1 20181102\n"
+          "(c) 2016-2018 Baltasar <baltasarq@gmail.com>\n\n" );
   print( "Teclea \"ayuda\" para conocer los posibles comandos.\n\n\n\n\n\n" );
+  
+  set_default_colors();
+  
   print( "Un perfecto tiempo de descanso en las profundidades de la estaca "
           "de Bares. Buceando, disfrutando del momento de paz y sosiego que "
           "tan solo las bajas temperaturas a diez metros bajo la superficie "
@@ -70,17 +73,13 @@ int main()
 	Player player;
 	Order * order;
 
-    #ifdef __CPC__
-        cpc_setmode( 2 );
-    #endif
-
 	init_game( &player );
 	play_intro();
 
 	// Main loop
 	cls();
 	do {
-		// Pro1
+		// Proc1
         set_default_colors();
 		do_loc_desc( player->num_loc );
 		proc1( &player );
@@ -91,7 +90,7 @@ int main()
 
 		// Parse order
         set_answer_colors();
-		order = parse( buffer );
+		order = parse( &player, buffer );
         resp( &player, order );
 
 		// Proc2
@@ -99,32 +98,26 @@ int main()
 		  player.num_turns += 1;
 		  proc2( &player );
 		}
-	} while( order->cmd.cmdId != Cmd_End );
+	} while( order->cmd.cmdId != CmdEnd );
 
 	return EXIT_SUCCESS;
 }
 
 void set_default_colors()
 {
-    #ifndef __CPC__
-        textbackground( WHITE );
-        textcolor( BLUE );
-    #else
-        textbackground( BLACK );
-        textcolor( WHITE );
-    #endif
+    textbackground( WHITE );
+    textcolor( BLUE );
 }
 
 void set_answer_colors()
 {
-    #ifndef __CPC__
-        textbackground( WHITE );
-        textcolor( BLACK );
-    #endif
+    textbackground( WHITE );
+    textcolor( BLACK );
 }
 
 /** Cleans the screen and sets the appropriate colors */
-void cls() {
+void cls()
+{
   clrscr();
   set_default_colors();
 }
@@ -138,18 +131,15 @@ char * input(const char * msg)
 	static char buffer[32];
 
 	// Prompt
-    #ifndef __CPC__
-        textbackground( BLUE );
-        textcolor( YELLOW );
-    #endif
+    textbackground( BLUE );
+    textcolor( YELLOW );
+
 	cprintf( "%s", msg );
 	fflush( stdout );
 
 	// Get order
-    #ifndef __CPC__
-        set_default_colors();
-        textcolor( RED );
-    #endif
+    set_default_colors();
+    textcolor( RED );
 
 	printf( " " );
 	fgets( buffer, 32, stdin );
@@ -161,53 +151,36 @@ char * input(const char * msg)
 		*last_char = 0;
 	}
 
-    #ifndef __CPC__
-        set_default_colors();
-    #endif
+    set_default_colors();
 	return buffer;
 }
 
-/** Prints a (possibly) long text, taking max columns into account
+/** Prints a (possibly) long text, taking max columns into account.
+  * Warning: it modifies text, substituting spaces by CR.
   * @param txt The text to print, as a char *
   */
 void print(const char * txt)
 {
-  int margin = MAX_COL - 10;
-  char * ptr = txt;
-  bool look_for_cr = false;
-
-  while ( *ptr != '\0' )
-  {
-    if ( look_for_cr
-      && ( *ptr == ' '
-        || *ptr == '\n' ) )
-    {
-      *ptr = '\n';
-      look_for_cr = false;
-    }
-    else
-    if ( ptr == '\n' ) {
-        txt = ptr + 1;
-    } else {
-      int pos = ptr - txt;
-
-      if ( pos > 0
-        && pos % margin == 0 )
-      {
-        look_for_cr = true;
-      }
+    int pos = MAX_COL - 1;
+    
+    while( pos < strlen( txt ) ) {
+        while( pos > 2
+            && !isspace( txt[ pos ] ) )
+        {
+            --pos;
+        }
+        
+        txt[ pos ] = '\n';
+        pos += MAX_COL - 1;
     }
 
-    ++ptr;
-  }
-
-  printf( "%s\n", txt );
+    printf( "%s\n", txt );
 }
 
 bool is_word_in_syns(char * word, char * syns)
 {
-  static char search_word[LENGTH_WORD + 2];
-  uint word_length = strlen( word );
+  static char search_word[LengthWord + 3];
+  int word_length = strlen( word );
 
   // Build search word
   *search_word = ' ';
@@ -216,7 +189,7 @@ bool is_word_in_syns(char * word, char * syns)
   *( search_word + word_length + 2 ) = 0;
 
   // Determine if included
-  //printf( "'%s' in '%s'%c", search_word, syns, 13 );
+  // printf( "'%s' in '%s'%c", search_word, syns, 13 );
   return ( strstr( syns, search_word ) != NULL );
 }
 
@@ -235,8 +208,8 @@ bool is_word_ignorable(char * word)
 void assign_word(Order * order, char * word)
 {
   /* Truncate word, if needed */
-  if ( strlen( word ) > LENGTH_WORD ) {
-    *( word + LENGTH_WORD ) = 0;
+  if ( strlen( word ) > LengthWord ) {
+    *( word + LengthWord ) = 0;
   }
 
   /* Assign word to the appropriate slot in the order */
@@ -267,13 +240,13 @@ Cmd * find_cmd(char * word)
       && strlen( word ) > 0 )
     {
         // Find command
-        for (; i < NUM_CMDS; ++i) {
+        for (; i < NumCmds; ++i) {
             if ( is_word_in_syns( word, cmds[i].words ) ) {
                 break;
             }
         }
 
-        if ( i < NUM_CMDS ) {
+        if ( i < NumCmds ) {
           toret = &cmds[ i ];
         } else {
           toret = cmdNop;
@@ -283,16 +256,19 @@ Cmd * find_cmd(char * word)
     return toret;
 }
 
-Obj * find_obj(char * word)
+Obj * find_obj(Player * player, char * word)
 {
-	int i = 0;
-	Obj * toret = NULL;
+    int i = 0;
+    Obj * toret = NULL;
 
     if ( word != NULL
       && strlen( word ) > 0 )
     {
-        for(; i < NUM_OBJS; ++i) {
-            if ( is_word_in_syns( word, objs[ i ].words ) ) {
+        for(; i < NumObjs; ++i) {
+            if ( ( objs[ i ].num_loc == player->num_loc
+                || objs[ i ].num_loc == PLAYER_NUM_LOC )
+              && is_word_in_syns( word, objs[ i ].words ) )
+            {
                 toret = &objs[ i ];
                 break;
             }
@@ -302,14 +278,14 @@ Obj * find_obj(char * word)
 	return toret;
 }
 
-void find_words(Order * order)
+void find_words(Player * player, Order * order)
 {
     order->cmd = find_cmd( order->verb );
-    order->obj1 = find_obj( order->word1 );
-    order->obj2 = find_obj( order->word2 );
+    order->obj1 = find_obj( player, order->word1 );
+    order->obj2 = find_obj( player, order->word2 );
 }
 
-Order * parse(char * buffer)
+Order * parse(Player * player, char * buffer)
 {
 	static Order toret;
 	char * p = buffer;
@@ -344,16 +320,6 @@ Order * parse(char * buffer)
 	*p = 0;
 	assign_word( &toret, word );
 
-	find_words( &toret );
-
-//	printf( "Verb: '%s', Word1: '%s', Word2: '%s'\n",
-//				toret.verb, toret.word1, toret.word2 );
-//	printf( "Cmd: %d, Obj1: %d, Obj2: %d\n",
-//				toret.cmd->cmdId, toret.obj1, toret.obj2 );
-//	if ( toret.obj1 != NULL ) {
-//		printf( "Objeto: '%s', loc: %d, desc: '%s'\n",
-//			toret.obj1->id, toret.obj1->num_loc, toret.obj1->desc );
-//	}
-
+	find_words( player, &toret );
 	return &toret;
 }
