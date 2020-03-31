@@ -6,6 +6,7 @@
 
 #include <stdbool.h>
 #include <string.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
 
@@ -159,7 +160,7 @@ void init_cmds()
     cmds[18].cmdId = CmdPush;
     cmds[18].doIt = cmdPush_doIt;
     cmds[18].words = " empuj pulsa pulso mueve muevo ";
-    
+
     // Debug
     cmds[19].cmdId = CmdDbg;
     cmds[19].doIt = cmdDbg_doIt;
@@ -394,7 +395,7 @@ void cmdDbg_doIt(Player * player, Order * order)
     strcpy( buffer, "Player loc: " );
     itoa( player->num_loc, buffer + strlen( buffer ), 10 );
     printf( "%s\n", buffer );
-    
+
     // Objects
     for(i = 0; i < NumObjs; ++i) {
         itoa( i, buffer, 10 );
@@ -402,17 +403,17 @@ void cmdDbg_doIt(Player * player, Order * order)
         strcpy( buffer + strlen( buffer ), objs[ i ].id );
         strcpy( buffer + strlen( buffer ), " @" );
         itoa( objs[ i ].num_loc, buffer + strlen( buffer ), 10 );
-        
+
         if ( i % 5 == 0 ) {
             input( "ENTER..." );
         }
-        
+
         printf( "%s\n", buffer );
     }
 #else
     print( MSG_CANT_DO );
 #endif
-    
+
     return;
 }
 

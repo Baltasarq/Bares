@@ -2,6 +2,7 @@
 
 #include "player.h"
 #include "objs.h"
+#include "locs.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -11,6 +12,10 @@
 
 
 const int MAX_INV_OBJS = 4;
+
+
+extern void restart(Player *);
+
 
 /** Inits the game
   * @param player The player structure
@@ -84,7 +89,7 @@ void proc1(Player * player)
     const Obj * ObjPuertas = locate_obj_by_id( "puertas" );
 
     static bool isSubDesc = false;
-    
+
     // You take the concrete walls, ceiling and floor wherever you go.
     ObjWalls->num_loc = LIMBO;
     if ( player->num_loc > 0 ) {
@@ -95,7 +100,7 @@ void proc1(Player * player)
 	if ( player->num_loc <= 7 ) {
 		ObjMar->num_loc = player->num_loc;
 	}
-	
+
 	// The stairs are found in loc #5 (dock D-3) and loc #2 (first dock)
 	if ( player->num_loc == 2
       || player->num_loc == 5
@@ -131,7 +136,7 @@ void proc1(Player * player)
     }
 
     // Move dust around
-    if ( player->num_loc >= 9 ) {        
+    if ( player->num_loc >= 9 ) {
         ObjPolvo->num_loc = player->num_loc;
     }
 
@@ -141,7 +146,7 @@ void proc1(Player * player)
     {
         ObjBaldas->num_loc = player->num_loc;
     }
-    
+
     // Move the doors with you
     if ( player->num_loc >= 8 ) {
         ObjPuertas->num_loc = player->num_loc;
@@ -180,7 +185,7 @@ void proc2(Player * player)
 		printf( "\n" );
 		player->num_loc = 2;
 	}
-	
+
 	return;
 }
 
@@ -198,7 +203,7 @@ void resp(Player * player, Order * order)
     const Obj * ObjBaldas = locate_obj_by_id( "baldas" );
     const Obj * ObjCaja = locate_obj_by_id( "caja" );
     const Obj * ObjBotonera = locate_obj_by_id( "botonera" );
-    
+
     static bool caja_abierta = false;
     bool intercepted = false;
 
@@ -211,9 +216,8 @@ void resp(Player * player, Order * order)
         return;
     }
 
-
     // Deja o quitate las aletas
-    if ( order->cmd->cmdId == CmdDisrobe 
+    if ( order->cmd->cmdId == CmdDisrobe
       && order->obj1 == ObjAletas
       && ObjAletas->num_loc == PLAYER_NUM_LOC )
     {
@@ -367,7 +371,6 @@ void resp(Player * player, Order * order)
             }
         }
     }
-
 
     if ( !intercepted ) {
         order->cmd->doIt( player, order );

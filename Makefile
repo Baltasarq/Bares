@@ -4,7 +4,7 @@ CFLAGS=+zx -O3 -SO3 -clib=ansi
 all: bares
 
 bares: bares.c player locs objs cmds
-	$(CC) $(CFLAGS) -create-app bares.c player.o locs.o objs.o cmds.o -obares -lndos
+	$(CC) $(CFLAGS) -create-app bares.c player.o locs.o objs.o cmds.o -obares -lndos -lm
 	
 player: player.h player.c
 	$(CC) $(CFLAGS) -c player.c -oplayer.o
