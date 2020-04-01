@@ -147,13 +147,6 @@ char * input(const char * msg)
 	printf( " " );
 	fgets( buffer, 32, stdin );
 
-	// Remove last '\n'
-	last_char = buffer + ( strlen( buffer ) - 1 );
-
-	if ( *last_char == '\n' ) {
-		*last_char = 0;
-	}
-
     set_default_colors();
 	return buffer;
 }
