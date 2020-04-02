@@ -12,7 +12,7 @@
 
 
 /* Constants */
-const int MAX_COL = 65;
+const int MAX_COL = 64;
 const char * PROMPT = ":> ";
 const char * PROMPT_WAIT = "Pulsa ENTER...";
 
