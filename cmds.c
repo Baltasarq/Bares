@@ -288,7 +288,7 @@ void cmdTake_doIt(Player * player, Order * order)
 
 void cmdDrop_doIt(Player * player, Order * order)
 {
-	char * msg = MSG_DONT_CARRIED;
+	const char * msg = MSG_DONT_CARRIED;
 
 	if ( order->obj1 != NULL ) {
 		if ( order->obj1->num_loc == PLAYER_NUM_LOC ) {
@@ -322,7 +322,7 @@ void cmdSwim_doIt(Player * player, Order * order)
 
 void cmdWear_doIt(Player * player, Order * order)
 {
-    char * msg;
+    const char * msg;
     Obj * obj = order->obj1;
 
 	if ( obj != NULL
@@ -347,7 +347,7 @@ void cmdWear_doIt(Player * player, Order * order)
 
 void cmdDisrobe_doIt(Player * player, Order * order)
 {
-    char * msg;
+    const char * msg;
     Obj * obj = order->obj1;
 
 	if ( obj != NULL ) {

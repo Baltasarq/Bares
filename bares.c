@@ -173,7 +173,7 @@ void print(const char * txt)
     printf( "%s\n", txt );
 }
 
-bool is_word_in_syns(char * word, char * syns)
+bool is_word_in_syns(const char * word, const char * syns)
 {
 	static char search_word[LengthWord + 3];
 	int word_length = strlen( word );
@@ -189,7 +189,7 @@ bool is_word_in_syns(char * word, char * syns)
 	return ( strstr( syns, search_word ) != NULL );
 }
 
-bool is_word_ignorable(char * word)
+bool is_word_ignorable(const char * word)
 {
 	static const char * ignorable_words =
     	" un una unos unas el la los las "
